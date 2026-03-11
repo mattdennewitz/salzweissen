@@ -11,16 +11,16 @@ TEST_CASE("Processor creates without crashing", "[processor]")
 TEST_CASE("Processor has correct parameter count", "[processor]")
 {
     SalzwiesenProcessor proc;
-    REQUIRE(proc.apvts.getParameter("PITCH") != nullptr);
-    REQUIRE(proc.apvts.getParameter("FINE") != nullptr);
-    REQUIRE(proc.apvts.getParameter("FORMANT") != nullptr);
-    REQUIRE(proc.apvts.getParameter("BARREL") != nullptr);
-    REQUIRE(proc.apvts.getParameter("AIR") != nullptr);
-    REQUIRE(proc.apvts.getParameter("FM_INDEX") != nullptr);
-    REQUIRE(proc.apvts.getParameter("MODE") != nullptr);
-    REQUIRE(proc.apvts.getParameter("MIX") != nullptr);
-    REQUIRE(proc.apvts.getParameter("SPREAD") != nullptr);
-    REQUIRE(proc.apvts.getParameter("MASTER") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("PITCH") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("FINE") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("FORMANT") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("BARREL") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("AIR") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("FM_INDEX") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("MODE") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("MIX") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("SPREAD") != nullptr);
+    REQUIRE(proc.getAPVTS().getParameter("MASTER") != nullptr);
 }
 
 TEST_CASE("Processor produces output with MIDI", "[processor]")
@@ -49,7 +49,7 @@ TEST_CASE("State persistence round-trip", "[processor]")
     SalzwiesenProcessor proc;
     proc.prepareToPlay(44100.0, 512);
 
-    auto* param = proc.apvts.getParameter("FORMANT");
+    auto* param = proc.getAPVTS().getParameter("FORMANT");
     param->setValueNotifyingHost(0.75f);
 
     juce::MemoryBlock stateData;
@@ -58,6 +58,6 @@ TEST_CASE("State persistence round-trip", "[processor]")
     SalzwiesenProcessor proc2;
     proc2.setStateInformation(stateData.getData(), static_cast<int>(stateData.getSize()));
 
-    float restored = proc2.apvts.getParameter("FORMANT")->getValue();
+    float restored = proc2.getAPVTS().getParameter("FORMANT")->getValue();
     REQUIRE_THAT(static_cast<double>(restored), Catch::Matchers::WithinAbs(0.75, 0.01));
 }

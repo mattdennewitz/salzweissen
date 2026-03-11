@@ -31,7 +31,7 @@ public:
     }
 
     // Returns anti-aliased square wave + rising edge flag
-    Output process()
+    Output process() noexcept
     {
         // Advance phase [0, 1)
         phase += phaseInc;

@@ -17,6 +17,9 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Install Ninja
+        run: brew install ninja
+
       - name: Configure
         run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 

@@ -16,15 +16,16 @@ SalzwiesenEditor::SalzwiesenEditor(SalzwiesenProcessor& p)
     setupKnob(spreadKnob, spreadLabel, "SPREAD");
     setupKnob(masterKnob, masterLabel, "MASTER");
 
-    pitchAttach   = std::make_unique<SliderAttachment>(processorRef.apvts, "PITCH", pitchKnob);
-    fineAttach    = std::make_unique<SliderAttachment>(processorRef.apvts, "FINE", fineKnob);
-    formantAttach = std::make_unique<SliderAttachment>(processorRef.apvts, "FORMANT", formantKnob);
-    barrelAttach  = std::make_unique<SliderAttachment>(processorRef.apvts, "BARREL", barrelKnob);
-    airAttach     = std::make_unique<SliderAttachment>(processorRef.apvts, "AIR", airKnob);
-    fmAttach      = std::make_unique<SliderAttachment>(processorRef.apvts, "FM_INDEX", fmKnob);
-    mixAttach     = std::make_unique<SliderAttachment>(processorRef.apvts, "MIX", mixKnob);
-    spreadAttach  = std::make_unique<SliderAttachment>(processorRef.apvts, "SPREAD", spreadKnob);
-    masterAttach  = std::make_unique<SliderAttachment>(processorRef.apvts, "MASTER", masterKnob);
+    auto& apvts = processorRef.getAPVTS();
+    pitchAttach   = std::make_unique<SliderAttachment>(apvts, ParamIDs::pitch.getParamID(), pitchKnob);
+    fineAttach    = std::make_unique<SliderAttachment>(apvts, ParamIDs::fine.getParamID(), fineKnob);
+    formantAttach = std::make_unique<SliderAttachment>(apvts, ParamIDs::formant.getParamID(), formantKnob);
+    barrelAttach  = std::make_unique<SliderAttachment>(apvts, ParamIDs::barrel.getParamID(), barrelKnob);
+    airAttach     = std::make_unique<SliderAttachment>(apvts, ParamIDs::air.getParamID(), airKnob);
+    fmAttach      = std::make_unique<SliderAttachment>(apvts, ParamIDs::fmIndex.getParamID(), fmKnob);
+    mixAttach     = std::make_unique<SliderAttachment>(apvts, ParamIDs::mix.getParamID(), mixKnob);
+    spreadAttach  = std::make_unique<SliderAttachment>(apvts, ParamIDs::spread.getParamID(), spreadKnob);
+    masterAttach  = std::make_unique<SliderAttachment>(apvts, ParamIDs::master.getParamID(), masterKnob);
 
     waveButton.setRadioGroupId(1001);
     formantButton.setRadioGroupId(1001);
@@ -32,12 +33,12 @@ SalzwiesenEditor::SalzwiesenEditor(SalzwiesenProcessor& p)
     formantButton.setClickingTogglesState(true);
 
     waveButton.onClick = [this]() {
-        auto* param = processorRef.apvts.getParameter("MODE");
+        auto* param = processorRef.getAPVTS().getParameter(ParamIDs::mode.getParamID());
         param->setValueNotifyingHost(param->convertTo0to1(0.0f));
         updateModeButtons();
     };
     formantButton.onClick = [this]() {
-        auto* param = processorRef.apvts.getParameter("MODE");
+        auto* param = processorRef.getAPVTS().getParameter(ParamIDs::mode.getParamID());
         param->setValueNotifyingHost(param->convertTo0to1(1.0f));
         updateModeButtons();
     };
@@ -69,7 +70,7 @@ void SalzwiesenEditor::setupKnob(juce::Slider& knob, juce::Label& label,
 
 void SalzwiesenEditor::updateModeButtons()
 {
-    float modeVal = processorRef.apvts.getParameter("MODE")->getValue();
+    float modeVal = processorRef.getAPVTS().getParameter(ParamIDs::mode.getParamID())->getValue();
     bool isFormant = modeVal > 0.5f;
     waveButton.setToggleState(!isFormant, juce::dontSendNotification);
     formantButton.setToggleState(isFormant, juce::dontSendNotification);

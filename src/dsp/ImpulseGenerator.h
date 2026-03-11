@@ -26,7 +26,7 @@ public:
         return true;
     }
 
-    float process(bool risingEdge)
+    float process(bool risingEdge) noexcept
     {
         if (risingEdge && active)
         {

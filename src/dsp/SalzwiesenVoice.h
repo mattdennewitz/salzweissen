@@ -16,13 +16,15 @@ public:
         float right;
     };
 
-    void prepare(double sampleRate)
+    void prepare(double sr)
     {
-        this->sampleRate = sampleRate;
+        if (sr <= 0.0) sr = 44100.0;
+        this->sampleRate = sr;
         osc.prepare(sampleRate);
         impulse.prepare(sampleRate);
 
         pitchSmoother.prepare(sampleRate, 10.0);
+        fineSmoother.prepare(sampleRate, 10.0);
         formantSmoother.prepare(sampleRate, 10.0);
         barrelSmoother.prepare(sampleRate, 10.0);
         airSmoother.prepare(sampleRate, 10.0);
@@ -51,9 +53,12 @@ public:
     {
         baseFreq = 440.0f * std::pow(2.0f, (midiNote - 69) / 12.0f);
         osc.reset();
+        shaper.reset();
+        prevFormantOut = 0.0f;
+        if (!playing)
+            rampGain = 0.0f;
         playing = true;
         rampActive = true;
-        rampGain = 0.0f;
         releasing = false;
     }
 
@@ -64,7 +69,7 @@ public:
     }
 
     void setPitch(float p)    { pitchSmoother.setTarget(p); }
-    void setFine(float f)     { fineValue = f; }
+    void setFine(float f)     { fineSmoother.setTarget(f); }
     void setFormant(float f)  { formantSmoother.setTarget(f); }
     void setBarrel(float b)   { barrelSmoother.setTarget(b); }
     void setAir(float a)      { airSmoother.setTarget(a); }
@@ -77,10 +82,10 @@ public:
     void setPitchAndFine(float pitch, float fine)
     {
         pitchSmoother.setTarget(pitch);
-        fineValue = fine;
+        fineSmoother.setTarget(fine);
     }
 
-    StereoSample process()
+    StereoSample process() noexcept
     {
         if (!playing)
             return {0.0f, 0.0f};
@@ -121,11 +126,12 @@ public:
         float master = masterSmoother.next();
 
         float pitchOffset = (pitch - 0.5f) * 6.0f;
-        float fineOffset = fineValue * 2.0f;
+        float fine = fineSmoother.next();
+        float fineOffset = fine * 2.0f;
         float freq = baseFreq * std::pow(2.0f, pitchOffset + fineOffset);
 
         float fmAmount = fmIndex * prevFormantOut * freq * 0.5f;
-        float finalFreq = std::max(20.0f, freq + fmAmount);
+        float finalFreq = std::clamp(freq + fmAmount, 20.0f, static_cast<float>(sampleRate) * 0.45f);
 
         osc.setFrequency(finalFreq);
 
@@ -167,7 +173,6 @@ private:
     bool playing = false;
     bool releasing = false;
     float prevFormantOut = 0.0f;
-    float fineValue = 0.0f;
 
     // Anti-click ramp
     int rampSamples = 220;
@@ -180,6 +185,7 @@ private:
     SineWaveshaper shaper;
 
     ParameterSmoother pitchSmoother;
+    ParameterSmoother fineSmoother;
     ParameterSmoother formantSmoother;
     ParameterSmoother barrelSmoother;
     ParameterSmoother airSmoother;

@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
+#include "Parameters.h"
 #include "ui/SalzwiesenLookAndFeel.h"
 
 class SalzwiesenEditor : public juce::AudioProcessorEditor

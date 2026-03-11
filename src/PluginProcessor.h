@@ -1,6 +1,5 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_dsp/juce_dsp.h>
 #include "dsp/SalzwiesenVoice.h"
 
 class SalzwiesenProcessor : public juce::AudioProcessor
@@ -33,9 +32,10 @@ public:
 
     bool isBusesLayoutSupported(const BusesLayout&) const override;
 
-    juce::AudioProcessorValueTreeState apvts;
+    juce::AudioProcessorValueTreeState& getAPVTS() { return apvts; }
 
 private:
+    juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     SalzwiesenVoice voice;
@@ -50,9 +50,6 @@ private:
     std::atomic<float>* mixParam = nullptr;
     std::atomic<float>* spreadParam = nullptr;
     std::atomic<float>* masterParam = nullptr;
-
-    juce::dsp::Oversampling<float> oversampler{2, 1,
-        juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false};
 
     int currentNote = -1;
 

@@ -1,21 +1,25 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Parameters.h"
 
 SalzwiesenProcessor::SalzwiesenProcessor()
     : AudioProcessor(BusesProperties()
         .withOutput("Output", juce::AudioChannelSet::stereo(), true))
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 {
-    pitchParam   = apvts.getRawParameterValue("PITCH");
-    fineParam    = apvts.getRawParameterValue("FINE");
-    formantParam = apvts.getRawParameterValue("FORMANT");
-    barrelParam  = apvts.getRawParameterValue("BARREL");
-    airParam     = apvts.getRawParameterValue("AIR");
-    fmIndexParam = apvts.getRawParameterValue("FM_INDEX");
-    modeParam    = apvts.getRawParameterValue("MODE");
-    mixParam     = apvts.getRawParameterValue("MIX");
-    spreadParam  = apvts.getRawParameterValue("SPREAD");
-    masterParam  = apvts.getRawParameterValue("MASTER");
+    pitchParam   = apvts.getRawParameterValue(ParamIDs::pitch.getParamID());
+    fineParam    = apvts.getRawParameterValue(ParamIDs::fine.getParamID());
+    formantParam = apvts.getRawParameterValue(ParamIDs::formant.getParamID());
+    barrelParam  = apvts.getRawParameterValue(ParamIDs::barrel.getParamID());
+    airParam     = apvts.getRawParameterValue(ParamIDs::air.getParamID());
+    fmIndexParam = apvts.getRawParameterValue(ParamIDs::fmIndex.getParamID());
+    modeParam    = apvts.getRawParameterValue(ParamIDs::mode.getParamID());
+    mixParam     = apvts.getRawParameterValue(ParamIDs::mix.getParamID());
+    spreadParam  = apvts.getRawParameterValue(ParamIDs::spread.getParamID());
+    masterParam  = apvts.getRawParameterValue(ParamIDs::master.getParamID());
+
+    jassert(pitchParam && fineParam && formantParam && barrelParam && airParam);
+    jassert(fmIndexParam && modeParam && mixParam && spreadParam && masterParam);
 }
 
 SalzwiesenProcessor::~SalzwiesenProcessor() {}
@@ -26,43 +30,43 @@ SalzwiesenProcessor::createParameterLayout()
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"PITCH", 1}, "Pitch",
+        ParamIDs::pitch, "Pitch",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"FINE", 1}, "Fine",
+        ParamIDs::fine, "Fine",
         juce::NormalisableRange<float>(-0.5f, 0.5f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"FORMANT", 1}, "Formant",
+        ParamIDs::formant, "Formant",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"BARREL", 1}, "Barrel",
+        ParamIDs::barrel, "Barrel",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"AIR", 1}, "Air",
+        ParamIDs::air, "Air",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.5f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"FM_INDEX", 1}, "FM Index",
+        ParamIDs::fmIndex, "FM Index",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterChoice>(
-        juce::ParameterID{"MODE", 1}, "Mode",
+        ParamIDs::mode, "Mode",
         juce::StringArray{"Wave", "Formant"}, 0));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"MIX", 1}, "Mix",
+        ParamIDs::mix, "Mix",
         juce::NormalisableRange<float>(0.0f, 1.0f), 1.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"SPREAD", 1}, "Spread",
+        ParamIDs::spread, "Spread",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID{"MASTER", 1}, "Master",
+        ParamIDs::master, "Master",
         juce::NormalisableRange<float>(0.0f, 1.0f), 0.7f));
 
     return layout;
@@ -71,7 +75,6 @@ SalzwiesenProcessor::createParameterLayout()
 void SalzwiesenProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     voice.prepare(sampleRate);
-    oversampler.initProcessing(static_cast<size_t>(samplesPerBlock));
 }
 
 void SalzwiesenProcessor::releaseResources() {}
@@ -89,7 +92,7 @@ void SalzwiesenProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     voice.setBarrel(barrelParam->load());
     voice.setAir(airParam->load());
     voice.setFmIndex(fmIndexParam->load());
-    voice.setMode(modeParam->load() > 0.5f);
+    voice.setMode(static_cast<int>(modeParam->load()) == 1);
     voice.setMix(mixParam->load());
     voice.setSpread(spreadParam->load());
     voice.setMaster(masterParam->load());
@@ -97,12 +100,12 @@ void SalzwiesenProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     for (const auto metadata : midiMessages)
     {
         auto msg = metadata.getMessage();
-        if (msg.isNoteOn())
+        if (msg.isNoteOn(true))
         {
             currentNote = msg.getNoteNumber();
             voice.noteOn(currentNote);
         }
-        else if (msg.isNoteOff() && msg.getNoteNumber() == currentNote)
+        else if (msg.isNoteOff(true) && msg.getNoteNumber() == currentNote)
         {
             voice.noteOff();
             currentNote = -1;

@@ -6,8 +6,9 @@ class SineWaveshaper
 {
 public:
     void setAir(float a) { air = a; }
+    void reset() { prevInput = 0.0f; }
 
-    float process(float input)
+    float process(float input) noexcept
     {
         if (air < 0.001f)
         {
