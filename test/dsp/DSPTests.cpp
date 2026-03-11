@@ -27,3 +27,43 @@ TEST_CASE("ParameterSmoother reset jumps immediately", "[dsp][smoother]")
 
     REQUIRE_THAT(smoother.next(), WithinAbs(0.75, 0.001));
 }
+
+#include "dsp/TriangleOscillator.h"
+#include <cmath>
+
+TEST_CASE("TriangleOscillator produces correct frequency", "[dsp][osc]")
+{
+    TriangleOscillator osc;
+    osc.prepare(44100.0);
+    osc.setFrequency(440.0f);
+
+    // Count rising edges over 1 second (44100 samples)
+    int risingEdges = 0;
+    for (int i = 0; i < 44100; ++i)
+    {
+        auto [square, edge] = osc.process();
+        if (edge) ++risingEdges;
+    }
+
+    // Should be ~440 edges (allow ±2 for boundary)
+    REQUIRE(risingEdges >= 438);
+    REQUIRE(risingEdges <= 442);
+}
+
+TEST_CASE("TriangleOscillator square output is bipolar", "[dsp][osc]")
+{
+    TriangleOscillator osc;
+    osc.prepare(44100.0);
+    osc.setFrequency(1000.0f);
+
+    float minVal = 1.0f, maxVal = -1.0f;
+    for (int i = 0; i < 4410; ++i)
+    {
+        auto [square, edge] = osc.process();
+        minVal = std::min(minVal, square);
+        maxVal = std::max(maxVal, square);
+    }
+
+    REQUIRE(minVal < -0.9f);
+    REQUIRE(maxVal > 0.9f);
+}
