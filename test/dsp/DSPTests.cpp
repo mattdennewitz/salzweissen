@@ -156,3 +156,69 @@ TEST_CASE("SineWaveshaper clips at air=1", "[dsp][shaper]")
     float result = shaper.process(0.8f);
     REQUIRE(std::abs(result) <= 1.01f);
 }
+
+#include "dsp/MangroveVoice.h"
+
+TEST_CASE("MangroveVoice produces non-silent output", "[dsp][voice]")
+{
+    MangroveVoice voice;
+    voice.prepare(44100.0);
+    voice.noteOn(60);  // Middle C
+
+    float maxAbs = 0.0f;
+    for (int i = 0; i < 4410; ++i)
+    {
+        auto [left, right] = voice.process();
+        maxAbs = std::max(maxAbs, std::max(std::abs(left), std::abs(right)));
+    }
+
+    REQUIRE(maxAbs > 0.01f);
+}
+
+TEST_CASE("MangroveVoice silence after noteOff", "[dsp][voice]")
+{
+    MangroveVoice voice;
+    voice.prepare(44100.0);
+    voice.noteOn(60);
+
+    for (int i = 0; i < 4410; ++i)
+        voice.process();
+
+    voice.noteOff();
+
+    for (int i = 0; i < 4410; ++i)
+        voice.process();
+
+    auto [left, right] = voice.process();
+    REQUIRE_THAT(left, WithinAbs(0.0, 0.01));
+}
+
+TEST_CASE("MangroveVoice mix knob blends square and formant", "[dsp][voice]")
+{
+    MangroveVoice voice;
+    voice.prepare(44100.0);
+    voice.noteOn(60);
+    voice.setMix(0.0f);
+
+    float sumMix0 = 0.0f;
+    for (int i = 0; i < 441; ++i)
+    {
+        auto [l, r] = voice.process();
+        sumMix0 += std::abs(l);
+    }
+
+    MangroveVoice voice2;
+    voice2.prepare(44100.0);
+    voice2.noteOn(60);
+    voice2.setMix(1.0f);
+
+    float sumMix1 = 0.0f;
+    for (int i = 0; i < 441; ++i)
+    {
+        auto [l, r] = voice2.process();
+        sumMix1 += std::abs(l);
+    }
+
+    REQUIRE(sumMix0 > 0.0f);
+    REQUIRE(sumMix1 > 0.0f);
+}
