@@ -9,7 +9,11 @@ public:
 
     float process(float input)
     {
-        if (air < 0.001f) return 0.0f;
+        if (air < 0.001f)
+        {
+            prevInput = input;
+            return 0.0f;
+        }
 
         float vcaGain;
         if (air <= 0.5f)
@@ -23,17 +27,27 @@ public:
             vcaGain = 1.0f;
         }
 
-        float signal = input * vcaGain;
+        // 2x oversampling: interpolate, shape both, average
+        float mid = (prevInput + input) * 0.5f;
+        prevInput = input;
 
-        if (air > 0.5f)
-        {
-            float drive = 1.0f + (air - 0.5f) * 2.0f * 4.0f;
-            signal = std::tanh(drive * std::sin(3.14159265359f * signal * 0.5f));
-        }
+        float out0 = shape(mid * vcaGain);
+        float out1 = shape(input * vcaGain);
 
-        return signal;
+        return (out0 + out1) * 0.5f;
     }
 
 private:
+    float shape(float signal) const
+    {
+        if (air > 0.5f)
+        {
+            float drive = 1.0f + (air - 0.5f) * 2.0f * 4.0f;
+            return std::tanh(drive * std::sin(3.14159265359f * signal * 0.5f));
+        }
+        return signal;
+    }
+
     float air = 0.5f;
+    float prevInput = 0.0f;
 };

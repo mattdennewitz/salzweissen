@@ -1,12 +1,12 @@
-#include "MangroveLookAndFeel.h"
+#include "SalzwiesenLookAndFeel.h"
 
-MangroveLookAndFeel::MangroveLookAndFeel()
+SalzwiesenLookAndFeel::SalzwiesenLookAndFeel()
 {
     setColour(juce::Slider::textBoxTextColourId, juce::Colour(textColor));
     setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 }
 
-void MangroveLookAndFeel::drawRotarySlider(juce::Graphics& g,
+void SalzwiesenLookAndFeel::drawRotarySlider(juce::Graphics& g,
                                             int x, int y, int width, int height,
                                             float sliderPos,
                                             float rotaryStartAngle,
@@ -48,7 +48,7 @@ void MangroveLookAndFeel::drawRotarySlider(juce::Graphics& g,
     g.fillEllipse(centre.x - 3.0f, centre.y - 3.0f, 6.0f, 6.0f);
 }
 
-void MangroveLookAndFeel::drawButtonBackground(juce::Graphics& g,
+void SalzwiesenLookAndFeel::drawButtonBackground(juce::Graphics& g,
                                                 juce::Button& button,
                                                 const juce::Colour&,
                                                 bool isHighlighted,
@@ -67,7 +67,7 @@ void MangroveLookAndFeel::drawButtonBackground(juce::Graphics& g,
     g.fillRoundedRectangle(bounds, cornerSize);
 }
 
-void MangroveLookAndFeel::drawButtonText(juce::Graphics& g,
+void SalzwiesenLookAndFeel::drawButtonText(juce::Graphics& g,
                                           juce::TextButton& button,
                                           bool,
                                           bool)

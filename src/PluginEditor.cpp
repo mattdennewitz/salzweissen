@@ -1,6 +1,6 @@
 #include "PluginEditor.h"
 
-MangroveEditor::MangroveEditor(MangroveProcessor& p)
+SalzwiesenEditor::SalzwiesenEditor(SalzwiesenProcessor& p)
     : AudioProcessorEditor(&p), processorRef(p)
 {
     setLookAndFeel(&lookAndFeel);
@@ -47,12 +47,12 @@ MangroveEditor::MangroveEditor(MangroveProcessor& p)
     updateModeButtons();
 }
 
-MangroveEditor::~MangroveEditor()
+SalzwiesenEditor::~SalzwiesenEditor()
 {
     setLookAndFeel(nullptr);
 }
 
-void MangroveEditor::setupKnob(juce::Slider& knob, juce::Label& label,
+void SalzwiesenEditor::setupKnob(juce::Slider& knob, juce::Label& label,
                                  const juce::String& text)
 {
     knob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -62,12 +62,12 @@ void MangroveEditor::setupKnob(juce::Slider& knob, juce::Label& label,
     label.setText(text, juce::dontSendNotification);
     label.setJustificationType(juce::Justification::centred);
     label.setColour(juce::Label::textColourId,
-                    juce::Colour(MangroveLookAndFeel::textDimColor));
+                    juce::Colour(SalzwiesenLookAndFeel::textDimColor));
     label.setFont(juce::Font(11.0f));
     addAndMakeVisible(label);
 }
 
-void MangroveEditor::updateModeButtons()
+void SalzwiesenEditor::updateModeButtons()
 {
     float modeVal = processorRef.apvts.getParameter("MODE")->getValue();
     bool isFormant = modeVal > 0.5f;
@@ -75,19 +75,19 @@ void MangroveEditor::updateModeButtons()
     formantButton.setToggleState(isFormant, juce::dontSendNotification);
 }
 
-void MangroveEditor::paint(juce::Graphics& g)
+void SalzwiesenEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colour(MangroveLookAndFeel::bgColor));
+    g.fillAll(juce::Colour(SalzwiesenLookAndFeel::bgColor));
 
-    g.setColour(juce::Colour(MangroveLookAndFeel::textColor));
+    g.setColour(juce::Colour(SalzwiesenLookAndFeel::textColor));
     g.setFont(juce::Font(20.0f).boldened());
-    g.drawText("MANGROVE", 20, 15, 200, 30, juce::Justification::centredLeft);
+    g.drawText("SALZWIESEN", 20, 15, 200, 30, juce::Justification::centredLeft);
 
-    g.setColour(juce::Colour(MangroveLookAndFeel::trackColor));
+    g.setColour(juce::Colour(SalzwiesenLookAndFeel::trackColor));
     g.drawHorizontalLine(250, 40.0f, 560.0f);
 }
 
-void MangroveEditor::resized()
+void SalzwiesenEditor::resized()
 {
     int knobSize = 80;
     int labelHeight = 20;

@@ -1,20 +1,20 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
-#include "ui/MangroveLookAndFeel.h"
+#include "ui/SalzwiesenLookAndFeel.h"
 
-class MangroveEditor : public juce::AudioProcessorEditor
+class SalzwiesenEditor : public juce::AudioProcessorEditor
 {
 public:
-    explicit MangroveEditor(MangroveProcessor&);
-    ~MangroveEditor() override;
+    explicit SalzwiesenEditor(SalzwiesenProcessor&);
+    ~SalzwiesenEditor() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
 
 private:
-    MangroveProcessor& processorRef;
-    MangroveLookAndFeel lookAndFeel;
+    SalzwiesenProcessor& processorRef;
+    SalzwiesenLookAndFeel lookAndFeel;
 
     juce::Slider pitchKnob, fineKnob, formantKnob, barrelKnob, airKnob;
     juce::Label  pitchLabel, fineLabel, formantLabel, barrelLabel, airLabel;
@@ -33,5 +33,5 @@ private:
     void setupKnob(juce::Slider& knob, juce::Label& label, const juce::String& text);
     void updateModeButtons();
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MangroveEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SalzwiesenEditor)
 };

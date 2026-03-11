@@ -1,7 +1,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-MangroveProcessor::MangroveProcessor()
+SalzwiesenProcessor::SalzwiesenProcessor()
     : AudioProcessor(BusesProperties()
         .withOutput("Output", juce::AudioChannelSet::stereo(), true))
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
@@ -18,10 +18,10 @@ MangroveProcessor::MangroveProcessor()
     masterParam  = apvts.getRawParameterValue("MASTER");
 }
 
-MangroveProcessor::~MangroveProcessor() {}
+SalzwiesenProcessor::~SalzwiesenProcessor() {}
 
 juce::AudioProcessorValueTreeState::ParameterLayout
-MangroveProcessor::createParameterLayout()
+SalzwiesenProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
@@ -68,15 +68,15 @@ MangroveProcessor::createParameterLayout()
     return layout;
 }
 
-void MangroveProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+void SalzwiesenProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     voice.prepare(sampleRate);
     oversampler.initProcessing(static_cast<size_t>(samplesPerBlock));
 }
 
-void MangroveProcessor::releaseResources() {}
+void SalzwiesenProcessor::releaseResources() {}
 
-void MangroveProcessor::processBlock(juce::AudioBuffer<float>& buffer,
+void SalzwiesenProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                                       juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -130,7 +130,7 @@ void MangroveProcessor::processBlock(juce::AudioBuffer<float>& buffer,
         buffer.clear(ch, 0, numSamples);
 }
 
-bool MangroveProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+bool SalzwiesenProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo()
         && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono())
@@ -138,24 +138,24 @@ bool MangroveProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
     return true;
 }
 
-juce::AudioProcessorEditor* MangroveProcessor::createEditor()
+juce::AudioProcessorEditor* SalzwiesenProcessor::createEditor()
 {
-    return new MangroveEditor(*this);
+    return new SalzwiesenEditor(*this);
 }
 
-bool MangroveProcessor::hasEditor() const { return true; }
-const juce::String MangroveProcessor::getName() const { return "Mangrove"; }
-bool MangroveProcessor::acceptsMidi() const { return true; }
-bool MangroveProcessor::producesMidi() const { return false; }
-bool MangroveProcessor::isMidiEffect() const { return false; }
-double MangroveProcessor::getTailLengthSeconds() const { return 0.0; }
-int MangroveProcessor::getNumPrograms() { return 1; }
-int MangroveProcessor::getCurrentProgram() { return 0; }
-void MangroveProcessor::setCurrentProgram(int) {}
-const juce::String MangroveProcessor::getProgramName(int) { return {}; }
-void MangroveProcessor::changeProgramName(int, const juce::String&) {}
+bool SalzwiesenProcessor::hasEditor() const { return true; }
+const juce::String SalzwiesenProcessor::getName() const { return "Salzwiesen"; }
+bool SalzwiesenProcessor::acceptsMidi() const { return true; }
+bool SalzwiesenProcessor::producesMidi() const { return false; }
+bool SalzwiesenProcessor::isMidiEffect() const { return false; }
+double SalzwiesenProcessor::getTailLengthSeconds() const { return 0.0; }
+int SalzwiesenProcessor::getNumPrograms() { return 1; }
+int SalzwiesenProcessor::getCurrentProgram() { return 0; }
+void SalzwiesenProcessor::setCurrentProgram(int) {}
+const juce::String SalzwiesenProcessor::getProgramName(int) { return {}; }
+void SalzwiesenProcessor::changeProgramName(int, const juce::String&) {}
 
-void MangroveProcessor::getStateInformation(juce::MemoryBlock& destData)
+void SalzwiesenProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
@@ -164,7 +164,7 @@ void MangroveProcessor::getStateInformation(juce::MemoryBlock& destData)
     copyXmlToBinary(*xml, destData);
 }
 
-void MangroveProcessor::setStateInformation(const void* data, int sizeInBytes)
+void SalzwiesenProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     if (data == nullptr || sizeInBytes <= 0) return;
     std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
@@ -177,5 +177,5 @@ void MangroveProcessor::setStateInformation(const void* data, int sizeInBytes)
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new MangroveProcessor();
+    return new SalzwiesenProcessor();
 }

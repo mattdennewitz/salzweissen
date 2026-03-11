@@ -34,9 +34,9 @@ clean:
 validate: build-plugin
 	killall -9 AudioComponentRegistrar 2>/dev/null; true
 	sleep 1
-	auval -v aumu Mngr DsEr
+	auval -v aumu Slzw DsEr
 
 uninstall:
-	rm -rf "$(HOME)/Library/Audio/Plug-Ins/VST3/Mangrove.vst3"
-	rm -rf "$(HOME)/Library/Audio/Plug-Ins/Components/Mangrove.component"
+	rm -rf "$(HOME)/Library/Audio/Plug-Ins/VST3/Salzwiesen.vst3"
+	rm -rf "$(HOME)/Library/Audio/Plug-Ins/Components/Salzwiesen.component"
 	killall -9 AudioComponentRegistrar 2>/dev/null; true

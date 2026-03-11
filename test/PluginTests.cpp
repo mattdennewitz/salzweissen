@@ -4,13 +4,13 @@
 
 TEST_CASE("Processor creates without crashing", "[processor]")
 {
-    MangroveProcessor proc;
-    REQUIRE(proc.getName() == "Mangrove");
+    SalzwiesenProcessor proc;
+    REQUIRE(proc.getName() == "Salzwiesen");
 }
 
 TEST_CASE("Processor has correct parameter count", "[processor]")
 {
-    MangroveProcessor proc;
+    SalzwiesenProcessor proc;
     REQUIRE(proc.apvts.getParameter("PITCH") != nullptr);
     REQUIRE(proc.apvts.getParameter("FINE") != nullptr);
     REQUIRE(proc.apvts.getParameter("FORMANT") != nullptr);
@@ -25,7 +25,7 @@ TEST_CASE("Processor has correct parameter count", "[processor]")
 
 TEST_CASE("Processor produces output with MIDI", "[processor]")
 {
-    MangroveProcessor proc;
+    SalzwiesenProcessor proc;
     proc.prepareToPlay(44100.0, 512);
 
     juce::AudioBuffer<float> buffer(2, 512);
@@ -46,7 +46,7 @@ TEST_CASE("Processor produces output with MIDI", "[processor]")
 
 TEST_CASE("State persistence round-trip", "[processor]")
 {
-    MangroveProcessor proc;
+    SalzwiesenProcessor proc;
     proc.prepareToPlay(44100.0, 512);
 
     auto* param = proc.apvts.getParameter("FORMANT");
@@ -55,7 +55,7 @@ TEST_CASE("State persistence round-trip", "[processor]")
     juce::MemoryBlock stateData;
     proc.getStateInformation(stateData);
 
-    MangroveProcessor proc2;
+    SalzwiesenProcessor proc2;
     proc2.setStateInformation(stateData.getData(), static_cast<int>(stateData.getSize()));
 
     float restored = proc2.apvts.getParameter("FORMANT")->getValue();

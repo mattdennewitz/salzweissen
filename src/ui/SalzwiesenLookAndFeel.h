@@ -1,10 +1,10 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class MangroveLookAndFeel : public juce::LookAndFeel_V4
+class SalzwiesenLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
-    MangroveLookAndFeel();
+    SalzwiesenLookAndFeel();
 
     void drawRotarySlider(juce::Graphics& g,
                           int x, int y, int width, int height,

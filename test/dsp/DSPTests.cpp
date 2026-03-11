@@ -157,11 +157,11 @@ TEST_CASE("SineWaveshaper clips at air=1", "[dsp][shaper]")
     REQUIRE(std::abs(result) <= 1.01f);
 }
 
-#include "dsp/MangroveVoice.h"
+#include "dsp/SalzwiesenVoice.h"
 
-TEST_CASE("MangroveVoice produces non-silent output", "[dsp][voice]")
+TEST_CASE("SalzwiesenVoice produces non-silent output", "[dsp][voice]")
 {
-    MangroveVoice voice;
+    SalzwiesenVoice voice;
     voice.prepare(44100.0);
     voice.noteOn(60);  // Middle C
 
@@ -175,9 +175,9 @@ TEST_CASE("MangroveVoice produces non-silent output", "[dsp][voice]")
     REQUIRE(maxAbs > 0.01f);
 }
 
-TEST_CASE("MangroveVoice silence after noteOff", "[dsp][voice]")
+TEST_CASE("SalzwiesenVoice silence after noteOff", "[dsp][voice]")
 {
-    MangroveVoice voice;
+    SalzwiesenVoice voice;
     voice.prepare(44100.0);
     voice.noteOn(60);
 
@@ -193,9 +193,9 @@ TEST_CASE("MangroveVoice silence after noteOff", "[dsp][voice]")
     REQUIRE_THAT(left, WithinAbs(0.0, 0.01));
 }
 
-TEST_CASE("MangroveVoice mix knob blends square and formant", "[dsp][voice]")
+TEST_CASE("SalzwiesenVoice mix knob blends square and formant", "[dsp][voice]")
 {
-    MangroveVoice voice;
+    SalzwiesenVoice voice;
     voice.prepare(44100.0);
     voice.noteOn(60);
     voice.setMix(0.0f);
@@ -207,7 +207,7 @@ TEST_CASE("MangroveVoice mix knob blends square and formant", "[dsp][voice]")
         sumMix0 += std::abs(l);
     }
 
-    MangroveVoice voice2;
+    SalzwiesenVoice voice2;
     voice2.prepare(44100.0);
     voice2.noteOn(60);
     voice2.setMix(1.0f);

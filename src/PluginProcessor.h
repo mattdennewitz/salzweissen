@@ -1,13 +1,13 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
-#include "dsp/MangroveVoice.h"
+#include "dsp/SalzwiesenVoice.h"
 
-class MangroveProcessor : public juce::AudioProcessor
+class SalzwiesenProcessor : public juce::AudioProcessor
 {
 public:
-    MangroveProcessor();
-    ~MangroveProcessor() override;
+    SalzwiesenProcessor();
+    ~SalzwiesenProcessor() override;
 
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -38,7 +38,7 @@ public:
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    MangroveVoice voice;
+    SalzwiesenVoice voice;
 
     std::atomic<float>* pitchParam = nullptr;
     std::atomic<float>* fineParam = nullptr;
@@ -56,5 +56,5 @@ private:
 
     int currentNote = -1;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MangroveProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SalzwiesenProcessor)
 };

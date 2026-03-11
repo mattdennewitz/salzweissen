@@ -7,7 +7,7 @@
 #include <utility>
 #include <algorithm>
 
-class MangroveVoice
+class SalzwiesenVoice
 {
 public:
     struct StereoSample
@@ -39,6 +39,12 @@ public:
 
         prevFormantOut = 0.0f;
         playing = false;
+
+        // Anti-click ramp: ~5ms
+        rampSamples = static_cast<int>(sampleRate * 0.005);
+        rampInc = 1.0f / static_cast<float>(rampSamples);
+        rampGain = 0.0f;
+        rampActive = false;
     }
 
     void noteOn(int midiNote)
@@ -46,11 +52,15 @@ public:
         baseFreq = 440.0f * std::pow(2.0f, (midiNote - 69) / 12.0f);
         osc.reset();
         playing = true;
+        rampActive = true;
+        rampGain = 0.0f;
+        releasing = false;
     }
 
     void noteOff()
     {
-        playing = false;
+        releasing = true;
+        rampActive = true;
     }
 
     void setPitch(float p)    { pitchSmoother.setTarget(p); }
@@ -74,6 +84,32 @@ public:
     {
         if (!playing)
             return {0.0f, 0.0f};
+
+        // Anti-click amplitude ramp
+        if (rampActive)
+        {
+            if (releasing)
+            {
+                rampGain -= rampInc;
+                if (rampGain <= 0.0f)
+                {
+                    rampGain = 0.0f;
+                    rampActive = false;
+                    releasing = false;
+                    playing = false;
+                    return {0.0f, 0.0f};
+                }
+            }
+            else
+            {
+                rampGain += rampInc;
+                if (rampGain >= 1.0f)
+                {
+                    rampGain = 1.0f;
+                    rampActive = false;
+                }
+            }
+        }
 
         float pitch = pitchSmoother.next();
         float formant = formantSmoother.next();
@@ -108,16 +144,18 @@ public:
 
         float mixed = square * (1.0f - mix) + formantOut * mix;
 
+        float gain = master * rampGain;
+
         float left, right;
         if (spread < 0.01f)
         {
-            left = right = mixed * master;
+            left = right = mixed * gain;
         }
         else
         {
             float monoMix = square * (1.0f - mix) + formantOut * mix;
-            left = (monoMix * (1.0f - spread) + square * spread) * master;
-            right = (monoMix * (1.0f - spread) + formantOut * spread) * master;
+            left = (monoMix * (1.0f - spread) + square * spread) * gain;
+            right = (monoMix * (1.0f - spread) + formantOut * spread) * gain;
         }
 
         return {left, right};
@@ -127,8 +165,15 @@ private:
     double sampleRate = 44100.0;
     float baseFreq = 440.0f;
     bool playing = false;
+    bool releasing = false;
     float prevFormantOut = 0.0f;
     float fineValue = 0.0f;
+
+    // Anti-click ramp
+    int rampSamples = 220;
+    float rampInc = 1.0f / 220.0f;
+    float rampGain = 0.0f;
+    bool rampActive = false;
 
     TriangleOscillator osc;
     ImpulseGenerator impulse;

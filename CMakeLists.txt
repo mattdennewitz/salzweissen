@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(Mangrove VERSION 1.0.0)
+project(Salzwiesen VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -7,12 +7,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(lib/JUCE)
 
-juce_add_plugin(Mangrove
+juce_add_plugin(Salzwiesen
     COMPANY_NAME "Die stille Erde"
     PLUGIN_MANUFACTURER_CODE DsEr
-    PLUGIN_CODE Mngr
+    PLUGIN_CODE Slzw
     FORMATS VST3 AU Standalone
-    PRODUCT_NAME "Mangrove"
+    PRODUCT_NAME "Salzwiesen"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE
@@ -23,22 +23,22 @@ juce_add_plugin(Mangrove
     VST3_CATEGORIES Instrument Synth
 )
 
-target_sources(Mangrove PRIVATE
+target_sources(Salzwiesen PRIVATE
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
-    src/ui/MangroveLookAndFeel.cpp
+    src/ui/SalzwiesenLookAndFeel.cpp
 )
 
-target_include_directories(Mangrove PRIVATE src)
+target_include_directories(Salzwiesen PRIVATE src)
 
-target_compile_definitions(Mangrove PUBLIC
+target_compile_definitions(Salzwiesen PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     DONT_SET_USING_JUCE_NAMESPACE=1
 )
 
-target_link_libraries(Mangrove
+target_link_libraries(Salzwiesen
     PRIVATE
         juce::juce_audio_processors
         juce::juce_audio_utils
@@ -59,17 +59,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(MangroveTests
+add_executable(SalzwiesenTests
     test/dsp/DSPTests.cpp
     test/PluginTests.cpp
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
-    src/ui/MangroveLookAndFeel.cpp
+    src/ui/SalzwiesenLookAndFeel.cpp
 )
 
-target_include_directories(MangroveTests PRIVATE src)
+target_include_directories(SalzwiesenTests PRIVATE src)
 
-target_link_libraries(MangroveTests PRIVATE
+target_link_libraries(SalzwiesenTests PRIVATE
     Catch2::Catch2WithMain
     juce::juce_audio_processors
     juce::juce_audio_utils
@@ -77,11 +77,11 @@ target_link_libraries(MangroveTests PRIVATE
     juce::juce_dsp
 )
 
-target_compile_definitions(MangroveTests PRIVATE
-    $<TARGET_PROPERTY:Mangrove,COMPILE_DEFINITIONS>
+target_compile_definitions(SalzwiesenTests PRIVATE
+    $<TARGET_PROPERTY:Salzwiesen,COMPILE_DEFINITIONS>
     JUCE_STANDALONE_APPLICATION=0
     JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=0
 )
 
 include(CTest)
-add_test(NAME MangroveTests COMMAND MangroveTests)
+add_test(NAME SalzwiesenTests COMMAND SalzwiesenTests)
