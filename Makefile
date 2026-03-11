@@ -2,7 +2,7 @@ BUILD_TYPE := Debug
 BUILD_DIR := build/$(shell echo $(BUILD_TYPE) | tr A-Z a-z)
 
 PLUGIN_AU_CODE := aumu
-PLUGIN_MFR_CODE := Whim
+PLUGIN_MFR_CODE := DsEr
 
 .PHONY: all release clean test validate install uninstall check-tools
 
@@ -34,7 +34,7 @@ clean:
 validate: build-plugin
 	killall -9 AudioComponentRegistrar 2>/dev/null; true
 	sleep 1
-	auval -v aumu Mngr Whim
+	auval -v aumu Mngr DsEr
 
 uninstall:
 	rm -rf "$(HOME)/Library/Audio/Plug-Ins/VST3/Mangrove.vst3"

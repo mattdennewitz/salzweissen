@@ -8,8 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(lib/JUCE)
 
 juce_add_plugin(Mangrove
-    COMPANY_NAME "Whimsical"
-    PLUGIN_MANUFACTURER_CODE Whim
+    COMPANY_NAME "Die stille Erde"
+    PLUGIN_MANUFACTURER_CODE DsEr
     PLUGIN_CODE Mngr
     FORMATS VST3 AU Standalone
     PRODUCT_NAME "Mangrove"
