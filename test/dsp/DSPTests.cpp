@@ -67,3 +67,62 @@ TEST_CASE("TriangleOscillator square output is bipolar", "[dsp][osc]")
     REQUIRE(minVal < -0.9f);
     REQUIRE(maxVal > 0.9f);
 }
+
+#include "dsp/ImpulseGenerator.h"
+
+TEST_CASE("ImpulseGenerator produces AR envelope on trigger", "[dsp][impulse]")
+{
+    ImpulseGenerator gen;
+    gen.prepare(44100.0);
+    gen.setDuration(0.5f);
+    gen.setBarrel(0.5f);
+
+    gen.trigger();
+
+    float peak = -2.0f;
+    float trough = 2.0f;
+    for (int i = 0; i < 200; ++i)
+    {
+        float val = gen.process(false);
+        peak = std::max(peak, val);
+        trough = std::min(trough, val);
+    }
+
+    REQUIRE(peak > 0.5f);
+    REQUIRE(trough < -0.5f);
+}
+
+TEST_CASE("ImpulseGenerator barrel=0 produces ramp shape", "[dsp][impulse]")
+{
+    ImpulseGenerator gen;
+    gen.prepare(44100.0);
+    gen.setDuration(0.5f);
+    gen.setBarrel(0.0f);
+
+    gen.trigger();
+
+    float first = gen.process(false);
+    REQUIRE(first < 0.0f);
+
+    float last = 0.0f;
+    for (int i = 0; i < 500; ++i)
+        last = gen.process(false);
+
+    REQUIRE(last <= 0.0f);
+}
+
+TEST_CASE("ImpulseGenerator pitch division skips retrigger", "[dsp][impulse]")
+{
+    ImpulseGenerator gen;
+    gen.prepare(44100.0);
+    gen.setDuration(0.99f);
+    gen.setBarrel(0.5f);
+
+    gen.trigger();
+
+    for (int i = 0; i < 5; ++i)
+        gen.process(false);
+
+    bool accepted = gen.trigger();
+    REQUIRE_FALSE(accepted);
+}
