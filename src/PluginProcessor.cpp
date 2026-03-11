@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 
 MangroveProcessor::MangroveProcessor()
     : AudioProcessor(BusesProperties()
@@ -139,7 +140,7 @@ bool MangroveProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 
 juce::AudioProcessorEditor* MangroveProcessor::createEditor()
 {
-    return new juce::GenericAudioProcessorEditor(*this);
+    return new MangroveEditor(*this);
 }
 
 bool MangroveProcessor::hasEditor() const { return true; }

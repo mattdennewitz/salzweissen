@@ -63,6 +63,7 @@ add_executable(MangroveTests
     test/dsp/DSPTests.cpp
     test/PluginTests.cpp
     src/PluginProcessor.cpp
+    src/PluginEditor.cpp
     src/ui/MangroveLookAndFeel.cpp
 )
 
