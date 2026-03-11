@@ -126,3 +126,33 @@ TEST_CASE("ImpulseGenerator pitch division skips retrigger", "[dsp][impulse]")
     bool accepted = gen.trigger();
     REQUIRE_FALSE(accepted);
 }
+
+#include "dsp/SineWaveshaper.h"
+
+TEST_CASE("SineWaveshaper silence at air=0", "[dsp][shaper]")
+{
+    SineWaveshaper shaper;
+    shaper.setAir(0.0f);
+
+    float result = shaper.process(1.0f);
+    REQUIRE_THAT(result, WithinAbs(0.0, 0.001));
+}
+
+TEST_CASE("SineWaveshaper linear at air=0.5", "[dsp][shaper]")
+{
+    SineWaveshaper shaper;
+    shaper.setAir(0.5f);
+
+    float result = shaper.process(0.5f);
+    REQUIRE(std::abs(result) > 0.1f);
+    REQUIRE(std::abs(result) < 1.0f);
+}
+
+TEST_CASE("SineWaveshaper clips at air=1", "[dsp][shaper]")
+{
+    SineWaveshaper shaper;
+    shaper.setAir(1.0f);
+
+    float result = shaper.process(0.8f);
+    REQUIRE(std::abs(result) <= 1.01f);
+}
